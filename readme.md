@@ -11,6 +11,6 @@ Prerequisite:
 
 Usage:
 ------
-app.js is the server, start it with:
-$ node app.js
-After that set up the IP and port in index.php, and load the page in browser :)
+ * app.js is the server, start it with:
+ * $ node app.js
+ * After that set up the IP and port in index.php, and load the page in browser :)
