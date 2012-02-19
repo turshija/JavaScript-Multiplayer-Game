@@ -43,7 +43,7 @@ defaultplayers['player2'] = {
 };
 
 var defaultball = {
-    x: 100,
+    x: 300,
     y: 50,
     velX: 200,
     velY: 200,
@@ -57,7 +57,7 @@ players['player2'] = defaultplayers['player2'];
 ball = defaultball;
 
 var frameCounter = 0,
-    frameRate = 5,      // brzina refresha, 1-svaki frejm, 2-svaki drugi, 3-svaki treci ...
+    frameRate = 1,      // brzina refresha, 1-svaki frejm, 2-svaki drugi, 3-svaki treci ...
     animationOn = false,
     canvas = {
         width: 940,
@@ -90,6 +90,26 @@ io.sockets.on('connection', function (socket) {
 
     }
 
+    function calculateDistance(player, ball) {
+        var a = Math.abs( (player.x + player.width/2) - ball.x );
+        var b = Math.abs( (player.y + player.height/2) - ball.y );
+        return Math.sqrt( Math.pow(a,2) + Math.pow(b,2) );
+    }
+
+    function checkCollision(ball, player, collisionXstart, collisionXend) {
+        if ( (ball.x + ball.size*2 > collisionXstart ) && (ball.x + ball.size*2 < collisionXend) ) {
+            var dist = calculateDistance(player, ball);
+            
+            console.log(dist);
+
+            if ( dist < (player.height/2 + ball.size) ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     function moveBall(canvas, ball, deltaTime) {
         var linearDistX = ball.velX * deltaTime / 1000,
             linearDistY = ball.velY * deltaTime / 1000;
@@ -97,6 +117,27 @@ io.sockets.on('connection', function (socket) {
 
         ball.x += linearDistX;
         ball.y += linearDistY;
+        
+        if ( ball.velX > 0 ) {
+            var col = checkCollision(ball,  players['player2'],     players['player2'].x,   players['player2'].x + players['player2'].width );
+
+            if (col) {
+                ball.velX *= -1;
+                ball.x = players['player2'].x - ball.size;
+            }
+        }
+        // if ( (ball.velX > 0) && (ball.x + ball.size*2 > players['player2'].x) ) {
+            
+        //     var dist = calculateDistance(players['player2'], ball);
+            
+        //     console.log(dist);
+
+        //     if ( dist < (players['player2'].height/2 + ball.size) ) {
+        //         ball.velX *= -1;
+        //         ball.x = players['player2'].x - ball.size;
+        //     }
+            
+        // }
 
         if (ball.y + ball.size > canvas.height) {
             ball.velY *= -1;

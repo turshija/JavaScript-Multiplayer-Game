@@ -25,7 +25,7 @@ $port = "8080";
                 currentPlayer,
                 started = false,    // Oznacava da li je u animacija u toku
                 frameCounter = 0,   // brojac
-                frameRate = 5,      // Na koliko frejmova salje podatke serveru, sto manje to brze
+                frameRate = 1,      // Na koliko frejmova salje podatke serveru, sto manje to brze
                 lagSmoothLvl = 5,   // Smooth umesto seckanja, 1-nema smooth, secka jako, 5 default
                 moveSpeed = 100;    // pixela u sekundi
             
@@ -207,7 +207,7 @@ $port = "8080";
                 // cuva X i Y koordinate u newX i newY, pa protivnik animira ka tim koordinatama
                 socket.on('updateObjects', function(allPlayers, serverBall) {
                     ball = serverBall;
-                    
+
                     for (i in allPlayers) {
                         if (i == currentPlayer) continue;
 
