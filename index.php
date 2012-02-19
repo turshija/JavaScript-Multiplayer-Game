@@ -205,7 +205,9 @@ $port = "8080";
                 // svih igraca i lopte
                 // Za trenutnog igraca ne updatuje nista (preskace ga), a za protivnika
                 // cuva X i Y koordinate u newX i newY, pa protivnik animira ka tim koordinatama
-                socket.on('updateObjects', function(allPlayers) {
+                socket.on('updateObjects', function(allPlayers, serverBall) {
+                    ball = serverBall;
+                    
                     for (i in allPlayers) {
                         if (i == currentPlayer) continue;
 

@@ -12,6 +12,7 @@ io.set('log level', 1);
 
 var players = {};
 var defaultplayers = {};
+var ball;
 
 defaultplayers['player1'] = {
     x: 10,
@@ -49,13 +50,19 @@ var defaultball = {
     size: 20
 }
 
+
+
 players['player1'] = defaultplayers['player1'];
-players['player2'] = defaultplayers['player2'];
-var ball = defaultball;
+players['player2'] = defaultplayers['player2']; 
+ball = defaultball;
 
 var frameCounter = 0,
     frameRate = 5,      // brzina refresha, 1-svaki frejm, 2-svaki drugi, 3-svaki treci ...
-    animationOn = false;
+    animationOn = false,
+    canvas = {
+        width: 940,
+        height: 300
+    }
 
 
 
@@ -70,8 +77,10 @@ io.sockets.on('connection', function (socket) {
         lastTime = time;
         frameCounter++;
 
+        moveBall(canvas, ball, deltaTime);
+
         if (frameCounter % frameRate == 0) {
-            io.sockets.emit('updateObjects', players);
+            io.sockets.emit('updateObjects', players, ball);
         }
 
 
@@ -79,6 +88,32 @@ io.sockets.on('connection', function (socket) {
             animate(lastTime)
         }, 1000/60 );
 
+    }
+
+    function moveBall(canvas, ball, deltaTime) {
+        var linearDistX = ball.velX * deltaTime / 1000,
+            linearDistY = ball.velY * deltaTime / 1000;
+        
+
+        ball.x += linearDistX;
+        ball.y += linearDistY;
+
+        if (ball.y + ball.size > canvas.height) {
+            ball.velY *= -1;
+            ball.y = canvas.height - ball.size - 10;
+        }
+        if (ball.y - ball.size < 0) {
+            ball.velY *= -1;
+            ball.y = ball.size + 10;
+        }
+        if (ball.x - ball.size < 0) {
+            ball.velX *= -1;
+            ball.x = ball.size + 10;
+        }
+        if (ball.x + ball.size > canvas.width) {
+            ball.velX *= -1;
+            ball.x = canvas.width - ball.size - 10;
+        }
     }
 
 
@@ -138,6 +173,9 @@ io.sockets.on('connection', function (socket) {
             var date = new Date();
             var time = date.getTime();
             animationOn = true;
+
+            
+            ball = defaultball;
 
             animate(time);
             io.sockets.emit('startgame');
