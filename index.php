@@ -108,14 +108,14 @@ $port = "8080";
                     ball.velY *= -1;
                     ball.y = ball.size + 10;
                 }
-                if (ball.x - ball.size < 0) {
-                    ball.velX *= -1;
-                    ball.x = ball.size + 10;
-                }
-                if (ball.x + ball.size > canvas.width) {
-                    ball.velX *= -1;
-                    ball.x = canvas.width - ball.size - 10;
-                }
+                // if (ball.x - ball.size < 0) {
+                //     ball.velX *= -1;
+                //     ball.x = ball.size + 10;
+                // }
+                // if (ball.x + ball.size > canvas.width) {
+                //     ball.velX *= -1;
+                //     ball.x = canvas.width - ball.size - 10;
+                // }
             }
             
             // Na osnovu korisnikovog inputa podesava brzinu igraca
