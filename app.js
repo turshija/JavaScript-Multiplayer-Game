@@ -12,7 +12,7 @@ io.set('log level', 1);
 
 var players = {};
 var defaultplayers = {};
-var ball;
+
 
 defaultplayers['player1'] = {
     x: 10,
@@ -47,14 +47,24 @@ var defaultball = {
     y: 50,
     velX: 400,
     velY: 0,
-    size: 20
+    size: 20,
+    maxSpeed: 1000
 }
 
+function cloneObject(source) {
+    for (i in source) {
+        if (typeof source[i] == 'source') {
+            this[i] = new cloneObject(source[i]);
+        }
+        else{
+            this[i] = source[i];
+        }
+    }
+}
 
-
-players['player1'] = defaultplayers['player1'];
-players['player2'] = defaultplayers['player2']; 
-ball = defaultball;
+players['player1'] = new cloneObject(defaultplayers['player1']);
+players['player2'] = new cloneObject(defaultplayers['player2']);
+var ball = new cloneObject(defaultball);
 
 var frameCounter = 0,
     frameRate = 3,      // brzina refresha, 1-svaki frejm, 2-svaki drugi, 3-svaki treci ...
@@ -63,6 +73,8 @@ var frameCounter = 0,
         width: 940,
         height: 300
     }
+
+
 
 
 
@@ -97,7 +109,11 @@ io.sockets.on('connection', function (socket) {
     }
 
     function checkCollision(ball, player, collisionXstart, collisionXend) {
-        if ( (ball.x + ball.size > collisionXstart ) && (ball.x + ball.size < collisionXend) ) {
+        // console.log(ball, player, collisionXstart, collisionXend);
+
+        // if ( (ball.x + ball.size > collisionXstart ) && (ball.x + ball.size < collisionXend) ) {
+        if ( (ball.x > collisionXstart ) && (ball.x < collisionXend) ) {
+            // console.log("RACUNADEM !");
             var dist = calculateDistance(player, ball);
             
             console.log(dist);
@@ -111,33 +127,32 @@ io.sockets.on('connection', function (socket) {
     }
 
     function moveBall(canvas, ball, deltaTime) {
-        var linearDistX = ball.velX * deltaTime / 1000,
+        var col = false,
+            linearDistX = ball.velX * deltaTime / 1000,
             linearDistY = ball.velY * deltaTime / 1000;
         
-
+        
         ball.x += linearDistX;
         ball.y += linearDistY;
         
         if ( ball.velX > 0 ) {
-            var col = checkCollision(ball,  players['player2'],     players['player2'].x,   players['player2'].x + players['player2'].width );
+            col = checkCollision(ball,  players['player2'],     players['player2'].x - ball.size,   players['player2'].x + players['player2'].width - ball.size );
 
             if (col) {
                 ball.velX *= -1;
                 ball.x = players['player2'].x - ball.size;
             }
         }
-        // if ( (ball.velX > 0) && (ball.x + ball.size*2 > players['player2'].x) ) {
-            
-        //     var dist = calculateDistance(players['player2'], ball);
-            
-        //     console.log(dist);
 
-        //     if ( dist < (players['player2'].height/2 + ball.size) ) {
-        //         ball.velX *= -1;
-        //         ball.x = players['player2'].x - ball.size;
-        //     }
-            
-        // }
+        if ( ball.velX < 0) {
+            col = checkCollision(ball,  players['player1'],     players['player1'].x + ball.size,   players['player1'].x + players['player1'].width + ball.size);
+
+            if (col) {
+                ball.velX *= -1;
+                ball.x = players['player1'].x + ball.size;
+            }
+        }
+        
 
         if (ball.y + ball.size > canvas.height) {
             ball.velY *= -1;
@@ -147,14 +162,26 @@ io.sockets.on('connection', function (socket) {
             ball.velY *= -1;
             ball.y = ball.size + 10;
         }
+
+
         if (ball.x - ball.size < 0) {
-            ball.velX *= -1;
-            ball.x = ball.size + 10;
+            // ball.x = 300;
+            // console.log(defaultball);
+            // ball.x = defaultball.x;
+            respawnBall();
         }
         if (ball.x + ball.size > canvas.width) {
-            ball.velX *= -1;
-            ball.x = canvas.width - ball.size - 10;
+            // ball.x = 300;
+            // console.log(defaultball);
+            // ball.x = defaultball.x;
+
+            respawnBall();
         }
+    }
+
+    function respawnBall() {
+        ball = new cloneObject( defaultball );
+        ball.velX *= -1;
     }
 
 
@@ -216,7 +243,7 @@ io.sockets.on('connection', function (socket) {
             animationOn = true;
 
             
-            ball = defaultball;
+            ball = new cloneObject(defaultball);
 
             animate(time);
             io.sockets.emit('startgame');
@@ -231,3 +258,5 @@ io.sockets.on('connection', function (socket) {
         socket.emit('ping', time);
     });
 });
+
+
