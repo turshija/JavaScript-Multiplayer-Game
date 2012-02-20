@@ -45,8 +45,8 @@ defaultplayers['player2'] = {
 var defaultball = {
     x: 300,
     y: 50,
-    velX: 200,
-    velY: 200,
+    velX: 400,
+    velY: 0,
     size: 20
 }
 
@@ -57,7 +57,7 @@ players['player2'] = defaultplayers['player2'];
 ball = defaultball;
 
 var frameCounter = 0,
-    frameRate = 1,      // brzina refresha, 1-svaki frejm, 2-svaki drugi, 3-svaki treci ...
+    frameRate = 3,      // brzina refresha, 1-svaki frejm, 2-svaki drugi, 3-svaki treci ...
     animationOn = false,
     canvas = {
         width: 940,
@@ -97,7 +97,7 @@ io.sockets.on('connection', function (socket) {
     }
 
     function checkCollision(ball, player, collisionXstart, collisionXend) {
-        if ( (ball.x + ball.size*2 > collisionXstart ) && (ball.x + ball.size*2 < collisionXend) ) {
+        if ( (ball.x + ball.size > collisionXstart ) && (ball.x + ball.size < collisionXend) ) {
             var dist = calculateDistance(player, ball);
             
             console.log(dist);

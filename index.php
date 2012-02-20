@@ -25,7 +25,7 @@ $port = "8080";
                 currentPlayer,
                 started = false,    // Oznacava da li je u animacija u toku
                 frameCounter = 0,   // brojac
-                frameRate = 1,      // Na koliko frejmova salje podatke serveru, sto manje to brze
+                frameRate = 3,      // Na koliko frejmova salje podatke serveru, sto manje to brze
                 lagSmoothLvl = 5,   // Smooth umesto seckanja, 1-nema smooth, secka jako, 5 default
                 moveSpeed = 100;    // pixela u sekundi
             
