@@ -178,7 +178,9 @@ io.sockets.on('connection', function (socket) {
     function speedUpBall(dist, player) {
         var speedChange = (dist / player.height) * 200;
         console.log(speedChange);
+        // ball.velX += speedChange;
         ball.velY += speedChange;
+
         
     }
 
