@@ -103,22 +103,21 @@ io.sockets.on('connection', function (socket) {
     }
 
     function calculateDistance(player, ball) {
-        var a = Math.abs( (player.x + player.width/2) - ball.x );
-        var b = Math.abs( (player.y + player.height/2) - ball.y );
-        return Math.sqrt( Math.pow(a,2) + Math.pow(b,2) );
+        var a = ( (player.x + player.width/2) - ball.x );
+        var b = ( (player.y + player.height/2) - ball.y );
+        var ret = Math.sqrt( Math.pow(a,2) + Math.pow(b,2) );
+
+        if (player.y + player.height/2 > ball.y) ret *= -1;
+
+        return ret;
     }
 
     function checkCollision(ball, player, collisionXstart, collisionXend) {
-        // console.log(ball, player, collisionXstart, collisionXend);
-
-        // if ( (ball.x + ball.size > collisionXstart ) && (ball.x + ball.size < collisionXend) ) {
         if ( (ball.x > collisionXstart ) && (ball.x < collisionXend) ) {
-            // console.log("RACUNADEM !");
             var dist = calculateDistance(player, ball);
-            
-            console.log(dist);
 
-            if ( dist < (player.height/2 + ball.size) ) {
+            if ( Math.abs(dist) < (player.height/2 + ball.size) ) {
+                speedUpBall(dist, player);
                 return true;
             }
         }
@@ -135,6 +134,7 @@ io.sockets.on('connection', function (socket) {
         ball.x += linearDistX;
         ball.y += linearDistY;
         
+        // Ukoliko se lopta krece ka desno, proveravamo koliziju sa player2
         if ( ball.velX > 0 ) {
             col = checkCollision(ball,  players['player2'],     players['player2'].x - ball.size,   players['player2'].x + players['player2'].width - ball.size );
 
@@ -144,6 +144,7 @@ io.sockets.on('connection', function (socket) {
             }
         }
 
+        // Ukoliko se lopta krece ka levo, proveravamo koliziju sa player1
         if ( ball.velX < 0) {
             col = checkCollision(ball,  players['player1'],     players['player1'].x + ball.size,   players['player1'].x + players['player1'].width + ball.size);
 
@@ -165,23 +166,32 @@ io.sockets.on('connection', function (socket) {
 
 
         if (ball.x - ball.size < 0) {
-            // ball.x = 300;
-            // console.log(defaultball);
-            // ball.x = defaultball.x;
+            // daj poene player2
             respawnBall();
         }
         if (ball.x + ball.size > canvas.width) {
-            // ball.x = 300;
-            // console.log(defaultball);
-            // ball.x = defaultball.x;
-
+            // daj poene player1
             respawnBall();
         }
     }
 
+    function speedUpBall(dist, player) {
+        var speedChange = (dist / player.height) * 200;
+        console.log(speedChange);
+        ball.velY += speedChange;
+        
+    }
+
     function respawnBall() {
         ball = new cloneObject( defaultball );
-        ball.velX *= -1;
+
+        // 50/50 sansa da obrne smer lopte
+        // takodje loptu invertuje na drugu stranu u tom slucaju
+        // (da ne bude blizu igraca ka kojem pocinje da se krece)
+        if ( Math.floor(Math.random()*2) ) {
+            ball.velX *= -1;
+            ball.x = (canvas.width - ball.x);
+        }
     }
 
 
